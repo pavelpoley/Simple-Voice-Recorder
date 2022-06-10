@@ -137,12 +137,14 @@ class RecorderService : Service() {
                 release()
 
                 ensureBackgroundThread {
-                    if (isRPlus() && !hasProperStoredFirstParentUri(currFilePath) ) {
-                        addFileInNewMediaStore()
-                    } else {
-                        addFileInLegacyMediaStore()
+                    FfmpegHelper(this@RecorderService).execute(currFilePath) {
+                        if (isRPlus() && !hasProperStoredFirstParentUri(currFilePath)) {
+                            addFileInNewMediaStore()
+                        } else {
+                            addFileInLegacyMediaStore()
+                        }
+                        EventBus.getDefault().post(Events.RecordingCompleted())
                     }
-                    EventBus.getDefault().post(Events.RecordingCompleted())
                 }
             } catch (e: Exception) {
                 showErrorToast(e)
